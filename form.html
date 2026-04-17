@@ -105,6 +105,8 @@
     <div class="error-msg" id="phone-err">연락처를 입력해주세요.</div>
   </div>
 
+  <div id="debug-log" style="margin-bottom:16px;padding:10px;background:#f0f0f0;border-radius:8px;font-size:11px;font-family:monospace;color:#333;display:block;"></div>
+
   <div class="field">
     <label>이미지 <span style="color:var(--tg-theme-hint-color,#888);font-weight:400">(선택)</span></label>
     <div class="image-box" id="image-box">
@@ -120,13 +122,27 @@
   </div>
 
   <script>
+    const logEl = document.getElementById('debug-log');
+    function log(msg) {
+      const t = new Date().toLocaleTimeString();
+      logEl.innerHTML += `[${t}] ${msg}<br>`;
+    }
+
+    log('페이지 로드됨');
+
     const tg = window.Telegram.WebApp;
+    log('Telegram.WebApp: ' + (tg ? '✅' : '❌ undefined'));
+
     tg.ready();
+    log('ready() 호출됨');
     tg.expand();
+    log('expand() 호출됨');
 
     // URL에서 group chat_id 추출
     const urlParams = new URLSearchParams(window.location.search);
     const groupChatId = urlParams.get('chat_id');
+    log('chat_id: ' + (groupChatId || '없음'));
+    log('initData 길이: ' + (tg.initData?.length || 0));
 
     // 이미지 선택
     document.getElementById('image-box').addEventListener('click', () => {
@@ -170,10 +186,17 @@
 
     // 메인 버튼
     tg.MainButton.setText('신청하기').show();
-    tg.MainButton.onClick(() => {
-      if (!validate()) return;
+    log('MainButton 표시됨');
 
-      // sendData는 4096바이트 제한 - 이미지 제외하고 텍스트만 전송
+    tg.MainButton.onClick(() => {
+      log('신청하기 클릭됨');
+
+      if (!validate()) {
+        log('유효성 검사 실패');
+        return;
+      }
+      log('유효성 검사 통과');
+
       const payload = {
         name:      document.getElementById('name').value.trim(),
         address:   document.getElementById('address').value.trim(),
@@ -182,10 +205,15 @@
         chat_id:   groupChatId ? parseInt(groupChatId) : null,
       };
 
+      log('payload: ' + JSON.stringify(payload).slice(0, 100));
+      log('sendData 호출 시도...');
+
       try {
         tg.sendData(JSON.stringify(payload));
+        log('sendData 호출 완료');
       } catch (e) {
-        tg.showAlert('전송 중 오류가 발생했습니다: ' + e.message);
+        log('❌ 오류: ' + e.message);
+        tg.showAlert('오류: ' + e.message);
       }
     });
   </script>
