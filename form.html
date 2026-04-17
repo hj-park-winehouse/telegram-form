@@ -141,7 +141,13 @@
     // URL에서 group chat_id 추출
     const urlParams = new URLSearchParams(window.location.search);
     const groupChatId = urlParams.get('chat_id');
+    const applyType = urlParams.get('type') || '';
     log('chat_id: ' + (groupChatId || '없음'));
+
+    const typeLabels = {'신규': '📋 신규접수', '번이': '🔄 번이접수', '해지': '❌ 해지접수'};
+    if (applyType && typeLabels[applyType]) {
+      document.querySelector('h2').textContent = typeLabels[applyType];
+    }
     log('initData 길이: ' + (tg.initData?.length || 0));
 
     // 이미지 선택
@@ -203,6 +209,7 @@
         phone:     document.getElementById('phone').value.trim(),
         has_image: imageBase64 !== null,
         chat_id:   groupChatId ? parseInt(groupChatId) : null,
+        type:      applyType || null,
       };
 
       log('payload: ' + JSON.stringify(payload).slice(0, 100));
