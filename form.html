@@ -173,16 +173,20 @@
     tg.MainButton.onClick(() => {
       if (!validate()) return;
 
+      // sendData는 4096바이트 제한 - 이미지 제외하고 텍스트만 전송
       const payload = {
         name:      document.getElementById('name').value.trim(),
         address:   document.getElementById('address').value.trim(),
         phone:     document.getElementById('phone').value.trim(),
-        image:     imageBase64 || null,
+        has_image: imageBase64 !== null,
         chat_id:   groupChatId ? parseInt(groupChatId) : null,
       };
 
-      tg.MainButton.showProgress();
-      tg.sendData(JSON.stringify(payload));
+      try {
+        tg.sendData(JSON.stringify(payload));
+      } catch (e) {
+        tg.showAlert('전송 중 오류가 발생했습니다: ' + e.message);
+      }
     });
   </script>
 </body>
