@@ -85,7 +85,23 @@
   </style>
 </head>
 <body>
-  <h2>📋 신청서</h2>
+  <h2 id="form-title">📋 신청서</h2>
+
+  <div class="field">
+    <label>접수 유형 <span class="required">*</span></label>
+    <div style="display:flex;gap:8px;margin-top:4px;">
+      <label style="flex:1;display:flex;align-items:center;justify-content:center;padding:10px;border:1.5px solid #ddd;border-radius:10px;cursor:pointer;font-size:14px;font-weight:600;" id="btn-신규">
+        <input type="radio" name="type" value="신규" style="display:none"> 📋 신규
+      </label>
+      <label style="flex:1;display:flex;align-items:center;justify-content:center;padding:10px;border:1.5px solid #ddd;border-radius:10px;cursor:pointer;font-size:14px;font-weight:600;" id="btn-번이">
+        <input type="radio" name="type" value="번이" style="display:none"> 🔄 번이
+      </label>
+      <label style="flex:1;display:flex;align-items:center;justify-content:center;padding:10px;border:1.5px solid #ddd;border-radius:10px;cursor:pointer;font-size:14px;font-weight:600;" id="btn-해지">
+        <input type="radio" name="type" value="해지" style="display:none"> ❌ 해지
+      </label>
+    </div>
+    <div class="error-msg" id="type-err">접수 유형을 선택해주세요.</div>
+  </div>
 
   <div class="field">
     <label>이름 <span class="required">*</span></label>
@@ -172,9 +188,36 @@
       reader.readAsDataURL(file);
     });
 
+    // 유형 버튼 스타일
+    document.querySelectorAll('input[name="type"]').forEach(radio => {
+      radio.closest('label').addEventListener('click', () => {
+        document.querySelectorAll('input[name="type"]').forEach(r => {
+          r.closest('label').style.borderColor = '#ddd';
+          r.closest('label').style.background = '#fff';
+        });
+        radio.closest('label').style.borderColor = '#2481cc';
+        radio.closest('label').style.background = '#e8f0fe';
+      });
+    });
+
+    // URL에 type 파라미터 있으면 미리 선택
+    if (applyType) {
+      const preselect = document.querySelector(`input[name="type"][value="${applyType}"]`);
+      if (preselect) preselect.closest('label').click();
+    }
+
     // 유효성 검사
     function validate() {
       let valid = true;
+
+      const selectedType = document.querySelector('input[name="type"]:checked');
+      const typeErr = document.getElementById('type-err');
+      if (!selectedType) {
+        typeErr.style.display = 'block';
+        valid = false;
+      } else {
+        typeErr.style.display = 'none';
+      }
 
       ['name', 'address', 'phone'].forEach(id => {
         const val = document.getElementById(id).value.trim();
@@ -209,7 +252,7 @@
         phone:     document.getElementById('phone').value.trim(),
         has_image: imageBase64 !== null,
         chat_id:   groupChatId ? parseInt(groupChatId) : null,
-        type:      applyType || null,
+        type:      document.querySelector('input[name="type"]:checked')?.value || null,
       };
 
       log('payload: ' + JSON.stringify(payload).slice(0, 100));
