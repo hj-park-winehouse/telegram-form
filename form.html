@@ -124,6 +124,10 @@
     tg.ready();
     tg.expand();
 
+    // URL에서 group chat_id 추출
+    const urlParams = new URLSearchParams(window.location.search);
+    const groupChatId = urlParams.get('chat_id');
+
     // 이미지 선택
     document.getElementById('image-box').addEventListener('click', () => {
       document.getElementById('image-input').click();
@@ -174,6 +178,7 @@
         address:   document.getElementById('address').value.trim(),
         phone:     document.getElementById('phone').value.trim(),
         image:     imageBase64 || null,
+        chat_id:   groupChatId ? parseInt(groupChatId) : null,
       };
 
       tg.MainButton.showProgress();
