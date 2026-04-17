@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body style="background:#fff;color:#000;padding:20px;font-size:20px;">
+  <p>✅ Mini App 로드 성공</p>
+  <script>
+    Telegram.WebApp.ready();
+    Telegram.WebApp.expand();
+    document.body.innerHTML += '<p>✅ JS 실행됨</p>';
+  </script>
+</body>
+</html>
